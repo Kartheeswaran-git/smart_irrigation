@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droplets, Thermometer, Wind, Activity, Layers, AlertCircle } from 'lucide-react';
+import { Droplets, Thermometer, Wind, Activity, Layers, AlertCircle, Leaf } from 'lucide-react';
 
 export default function SensorCard({ title, value, unit, type }) {
   // Determine icon based on type or title
@@ -10,6 +10,8 @@ export default function SensorCard({ title, value, unit, type }) {
       case 'humidity': return <Droplets size={32} />;
       case 'water flow': return <Wind size={32} />; // Flow usually wind/air or specific pipe icon
       case 'well level': return <Activity size={32} />;
+      case 'crop type': return <Leaf size={32} />;
+      case 'crop days': return <Activity size={32} />;
       default: return <Activity size={32} />;
     }
   };

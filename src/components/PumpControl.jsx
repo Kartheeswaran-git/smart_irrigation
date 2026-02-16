@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ref, update } from "firebase/database";
 import { rtdb } from "../firebase"; // rtdb is Realtime Database
-import { Power, Settings, Clock, Droplets, Save } from 'lucide-react';
+import { Power, Settings, Clock, Droplets, Save, Activity } from 'lucide-react';
 
 export default function PumpControl({ irrigationData, farmId }) {
   const { pump, mode = 'manual', timer = { startTime: '06:00', duration: 15 } } = irrigationData || {};
@@ -127,6 +127,23 @@ export default function PumpControl({ irrigationData, farmId }) {
             <p className="helper-text">
               Pump will run daily at <strong>{editTimer.startTime}</strong> for <strong>{editTimer.duration} mins</strong>.
             </p>
+          </div>
+        )}
+
+        {/* ML Advice Section (Always Visible if Data Exists) */}
+        {(irrigationData?.advice || irrigationData?.mlDecision !== undefined) && (
+          <div className="ml-advice-section">
+            <div className="advice-header">
+              <Activity size={18} />
+              <h4>ML Recommendation</h4>
+            </div>
+            <div className={`advice-card ${irrigationData?.mlDecision ? 'on' : 'off'}`}>
+              <div className="advice-main">
+                <span className="advice-text">{irrigationData?.advice || (irrigationData?.mlDecision ? 'Pump ON' : 'Pump OFF')}</span>
+                <span className="advice-confidence">{irrigationData?.confidence}% confidence</span>
+              </div>
+              <p className="advice-sub">Based on live sensor data and real-time weather.</p>
+            </div>
           </div>
         )}
       </div>

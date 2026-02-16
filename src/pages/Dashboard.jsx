@@ -6,11 +6,12 @@ import { LogOut } from "lucide-react";
 
 import SensorCard from "../components/SensorCard";
 import PumpControl from "../components/PumpControl";
-import Fertilizer from "../components/Fertilizer";
+// import Fertilizer from "../components/Fertilizer";
 import WeatherWidget from "../components/WeatherWidget";
+import IrrigationForecast from "../components/IrrigationForecast";
 
 import { useAuth } from "../context/AuthContext";
-import { Settings } from "lucide-react";
+import { Settings, Leaf } from "lucide-react";
 
 export default function Dashboard() {
   const { userData, logout } = useAuth();
@@ -19,12 +20,17 @@ export default function Dashboard() {
     temp: 0,
     humidity: 0,
     flow: 0,
-    well: 0
+    well: 0,
+    CropType: 'N/A',
+    CropDays: 0
   });
   const [irrigation, setIrrigation] = useState({
     pump: false,
     mode: 'manual',
-    timer: { startTime: '06:00', duration: 30 }
+    timer: { startTime: '06:00', duration: 30 },
+    "5dayPlan": [],
+    advice: "N/A",
+    confidence: 0
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -39,8 +45,8 @@ export default function Dashboard() {
     const sensorRef = ref(rtdb, `farms/${userData.farmId}/liveData`);
     const unsubSensor = onValue(sensorRef, (snapshot) => {
       const val = snapshot.val();
-      if (val) setData(val);
-      setLoading(false); // Set loading to false once we have sensor data (or even if null)
+      if (val) setData(prev => ({ ...prev, ...val }));
+      setLoading(false); // Set loading to false once we have sensor data
     });
 
     // 2. Fetch Irrigation Status from REALTIME DB
@@ -108,6 +114,8 @@ export default function Dashboard() {
       </header>
 
       <div className="dashboard-grid">
+        <SensorCard title="Crop Type" value={data.CropType} unit="" />
+        <SensorCard title="Crop Days" value={data.CropDays} unit="Days" />
         <SensorCard title="Soil Moisture" value={data.soil} unit="%" />
         <SensorCard title="Temperature" value={data.temp} unit="°C" />
         <SensorCard title="Humidity" value={data.humidity} unit="%" />
@@ -118,8 +126,23 @@ export default function Dashboard() {
 
       <div className="controls-grid">
         <PumpControl irrigationData={irrigation} farmId={userData?.farmId} />
-        <Fertilizer date="2026-02-15" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* <Fertilizer date="2026-02-15" /> */}
+          <div className="sensor-card highlight" style={{ borderLeftColor: 'var(--earth-brown)' }}>
+            <div className="sensor-icon-wrapper" style={{ background: '#efebe9', color: 'var(--earth-brown)' }}>
+              <Leaf size={32} />
+            </div>
+            <div className="sensor-info">
+              <span className="sensor-title">Current Status</span>
+              <div className="sensor-value-group">
+                <span className="sensor-value" style={{ fontSize: '1.2rem' }}>{irrigation.advice || 'Optimizing...'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <IrrigationForecast forecast={irrigation["5dayPlan"]} />
     </div>
   );
 }
