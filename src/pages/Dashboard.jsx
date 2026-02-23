@@ -102,11 +102,7 @@ export default function Dashboard() {
         </div>
         <div className="header-actions" style={{ display: 'flex', gap: '10px' }}>
           {/* Debug/Dev Button */}
-          {userData?.role === 'admin' && (
-            <button onClick={() => navigate('/admin')} className="logout-btn" style={{ background: '#1a237e' }}>
-              <Settings size={18} style={{ marginRight: '8px' }} /> Admin Panel
-            </button>
-          )}
+          
           <button onClick={handleLogout} className="logout-btn">
             <LogOut size={18} /> Logout
           </button>
